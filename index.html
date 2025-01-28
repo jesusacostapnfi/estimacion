@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Estimación Puntual y por Intervalo</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+     <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link rel="stylesheet" href="font-awesome-4.3.0/css/font-awesome.min.css">
+  <link rel="shortcut icon" href="favicon (7).ico" type="image/x-icon">
+    <style>
+        body { padding: 50px;
+        background-color: #009688 !important; }
+        #intervalFields { display: none;}/*Ocultar campos de intervalo al inicio*/
+        .logo { 
+    position: absolute; /* Positioning the logo absolutely */ 
+    top: 10px; /* Adjust as needed */ 
+    right: 10px; /* Adjust as needed */ 
+    height: 40px; /* Adjust height as needed */ 
+} 
+
+
+    </style>
+
+</head>
+<body>
+     <header>
+        <nav>
+            <div class="nav-wrapper teal">
+                <div class="container">
+                    <img src="logouptag.png" class="logo">Matemática Aplicada</a>
+                    <ul id="nav-mobile" class="right hide-on-med-and-down">
+                        <li><a href="#">Acerca de</a></li>
+                        <li><a href="#">Ayuda</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+
+    </header>
+    <div class="container">
+        <div class="card-panel z-depth-5">
+             <center><h3>Estimación Puntual e Intervalo</h3></center>
+        <div class="row">
+            <form class="col s12" id="estimationForm">
+                <div class="row">
+                    <div class="input-field col s6">
+                        <select id="estimationType">
+                            <option value="pointMean" selected>Media Puntual</option>
+                            <option value="pointProportion">Proporción Puntual</option>
+                            <option value="intervalMean">Intervalo de Confianza para la Media</option>
+                        </select>
+                        <label>Tipo de Estimación</label>
+                    </div>
+                </div>
+
+                <div id="pointMeanFields" class="row">
+                    <div class="input-field col s12">
+                        <input type="text" id="meanData" name="meanData">
+                        <label for="meanData">Datos (separados por comas):</label>
+                    </div>
+                </div>
+
+                <div id="pointProportionFields" class="row" style="display:none;">
+                    <div class="input-field col s6">
+                        <input type="number" id="successes" name="successes" required>
+                        <label for="successes">Número de Éxitos:</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <input type="number" id="totalTrials" name="totalTrials" required>
+                        <label for="totalTrials">Número Total de Ensayos:</label>
+                    </div>
+                </div>
+                <div id="intervalFields" class="row">
+                    <div class="input-field col s4">
+                        <input type="number" id="meanInterval" name="meanInterval">
+                        <label for="meanInterval">Media Muestral:</label>
+                    </div>
+                    <div class="input-field col s4">
+                        <input type="number" id="stdDev" name="stdDev">
+                        <label for="stdDev">Desviación Estándar Muestral:</label>
+                    </div>
+                    <div class="input-field col s4">
+                        <input type="number" id="sampleSize" name="sampleSize">
+                        <label for="sampleSize">Tamaño de la Muestra:</label>
+                    </div>
+                  <div class="input-field col s6">
+                        <select id="confidenceLevel">
+                          <option value="0.90" selected>90%</option>
+                          <option value="0.95">95%</option>
+                          <option value="0.99">99%</option>
+                        </select>
+                        <label>Nivel de Confianza</label>
+                    </div>
+                </div>
+
+                <button class="btn waves-effect waves-light" type="button" onclick="calculateEstimation()">Calcular
+                    <i class="material-icons right">send</i>
+                </button>
+            </form>
+        </div>
+        <div id="result" class="card-panel teal lighten-4"></div>
+    </div>
+</div>
+
+ <footer class="page-footer teal">
+        <div class="container">
+            <div class="row">
+                <div class="col l6 s12">
+                    <h5 class="white-text">Realizado por:</h5>
+                    <p class="grey-text text-lighten-4">Jesus Acosta y Máximo Gonzalez. <br> Esta herramienta ayudará a realizar estimaciones estadísticas.</p>
+                </div>
+                <div class="col l4 offset-l2 s12">
+                    <h5 class="white-text">Profesor:</h5>
+                    <p class="grey-text text-lighten-4">Oswaldo Centeno</p>
+                    <p class="grey-text text-lighten-4">PNFI Seccion 30 T3T1</p>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="container">
+            <center>© 2025 Herramientas Estadísticas</center>
+            
+            </div>
+        </div>
+    </footer> 
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          var elems = document.querySelectorAll('select');
+          var instances = M.FormSelect.init(elems);
+        });
+
+      const estimationTypeSelect = document.getElementById('estimationType');
+      const pointMeanFields = document.getElementById('pointMeanFields');
+      const pointProportionFields = document.getElementById('pointProportionFields');
+      const intervalFields = document.getElementById('intervalFields');
+
+      estimationTypeSelect.addEventListener('change', function() {
+        pointMeanFields.style.display = 'none';
+        pointProportionFields.style.display = 'none';
+        intervalFields.style.display = 'none';
+
+        if (this.value === 'pointMean') {
+          pointMeanFields.style.display = 'block';
+        } else if (this.value === 'pointProportion') {
+          pointProportionFields.style.display = 'block';
+        } else if (this.value === 'intervalMean') {
+            intervalFields.style.display = 'block';
+        }
+      });
+    </script>
+</body>
+</html>
